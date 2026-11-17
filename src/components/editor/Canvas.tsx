@@ -14,6 +14,7 @@ import { createElement, type CSSProperties, type FocusEvent, type MouseEvent, ty
 
 import { getDefinition } from "@/blocks/registry";
 import { blockAriaLabel } from "@/blocks/summary";
+import { trackRender } from "@/lib/renderStats";
 import { useEditor } from "@/store/context";
 import { type Device, type DropIndicator, ROOT_DROP_ID } from "@/store/editor";
 
@@ -39,6 +40,7 @@ interface BlockNodeProps {
  * component is memoized, so every edit re-renders every block.
  */
 function BlockNode({ block, blocks, selectedId, indicator, level }: BlockNodeProps) {
+  trackRender("BlockNode");
   const select = useEditor((s) => s.select);
   const isColumn = block.type === "column";
 
@@ -147,6 +149,7 @@ function EmptyCanvas() {
 }
 
 export default function Canvas() {
+  trackRender("Canvas");
   const rootIds = useEditor((s) => s.rootIds);
   const blocks = useEditor((s) => s.blocks);
   const selectedId = useEditor((s) => s.selectedId);

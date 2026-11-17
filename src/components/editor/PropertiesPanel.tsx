@@ -5,6 +5,7 @@ import { type ReactNode, useId, useState } from "react";
 
 import { getDefinition, type ItemField, MAX_COLUMNS, MIN_COLUMNS, type PropField } from "@/blocks/registry";
 import { announce } from "@/lib/announce";
+import { trackRender } from "@/lib/renderStats";
 import { useEditor } from "@/store/context";
 
 const inputClass =
@@ -418,6 +419,7 @@ function PageSettings() {
 }
 
 export default function PropertiesPanel() {
+  trackRender("PropertiesPanel");
   const block = useEditor((s) => (s.selectedId ? s.blocks[s.selectedId] : undefined));
 
   if (!block) {

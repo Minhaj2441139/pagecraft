@@ -3,11 +3,13 @@
 import { useDraggable } from "@dnd-kit/core";
 
 import { type BlockDefinition, PALETTE_BLOCKS, PALETTE_CATEGORIES } from "@/blocks/registry";
+import { trackRender } from "@/lib/renderStats";
 import { useEditor } from "@/store/context";
 
 import { type DragData, PALETTE_PREFIX } from "./dnd";
 
 function PaletteItem({ def }: { def: BlockDefinition }) {
+  trackRender("PaletteItem");
   const addBlock = useEditor((s) => s.addBlock);
   const data: DragData = { kind: "palette", type: def.type };
   const { setNodeRef, listeners, isDragging } = useDraggable({ id: `${PALETTE_PREFIX}${def.type}`, data });

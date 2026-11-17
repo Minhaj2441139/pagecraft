@@ -16,7 +16,9 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "build:export": "npm run build -w @pagecraft/export"
+    "build:export": "npm run build -w @pagecraft/export",
+    "perf": "vitest run -c vitest.perf.config.ts",
+    "perf:browser": "node perf/browser.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -44,6 +46,7 @@
     "eslint": "^9.39.5",
     "eslint-config-next": "^16.4.6",
     "jsdom": "^31.0.1",
+    "playwright-core": "^1.65.1",
     "tailwindcss": "^4.3.5",
     "typescript": "^5.9.3",
     "vitest": "^5.1.0"

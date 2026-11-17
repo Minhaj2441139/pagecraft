@@ -1,0 +1,44 @@
+{
+  "label": "naive",
+  "date": "2026-11-17T19:53:50.005Z",
+  "url": "http://localhost:3123/editor?template=stress",
+  "environment": "Lighthouse 12, desktop preset, headless Chrome, local production build",
+  "runs": [
+    {
+      "score": 83,
+      "fcpMs": 233,
+      "lcpMs": 761,
+      "tbtMs": 373,
+      "cls": 0,
+      "speedIndexMs": 852,
+      "totalJsKB": 172.2
+    },
+    {
+      "score": 75,
+      "fcpMs": 227,
+      "lcpMs": 848,
+      "tbtMs": 613,
+      "cls": 0,
+      "speedIndexMs": 868,
+      "totalJsKB": 172.2
+    },
+    {
+      "score": 79,
+      "fcpMs": 234,
+      "lcpMs": 780,
+      "tbtMs": 467,
+      "cls": 0,
+      "speedIndexMs": 848,
+      "totalJsKB": 172.2
+    }
+  ],
+  "median": {
+    "score": 79,
+    "fcpMs": 233,
+    "lcpMs": 780,
+    "tbtMs": 467,
+    "cls": 0,
+    "speedIndexMs": 852,
+    "totalJsKB": 172.2
+  }
+}
