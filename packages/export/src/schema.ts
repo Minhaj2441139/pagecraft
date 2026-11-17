@@ -91,7 +91,3 @@ export interface PageDocument extends PageTree {
 }
 
 export const CONTAINER_TYPES: ReadonlySet<BlockType> = new Set(["columns", "column"]);
-
-export function isBlockOfType<T extends BlockType>(block: Block, type: T): block is Block<T> {
-  return block.type === type;
-}
