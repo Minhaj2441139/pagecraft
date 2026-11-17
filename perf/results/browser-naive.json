@@ -1,6 +1,6 @@
 {
   "label": "naive",
-  "date": "2026-11-17T19:49:57.634Z",
+  "date": "2026-11-17T19:58:02.511Z",
   "environment": "Chrome (playwright-core), production build at http://localhost:3123",
   "editorJs": {
     "files": 8,
@@ -10,14 +10,40 @@
   "typing": {
     "chars": 40,
     "runs": 3,
-    "medianWallMsFor40Chars": 882,
+    "medianWallMsFor40Chars": 776,
     "eventsOver16msPerRun": [
       160,
       160,
       160
     ],
-    "medianSlowEventMs": 32,
-    "p95SlowEventMs": 40,
+    "medianSlowEventMs": 24,
+    "p95SlowEventMs": 32,
     "maxEventMs": 48
+  },
+  "drag": {
+    "pointerSteps": 60,
+    "runs": [
+      {
+        "wallMs": 2561,
+        "longFrames": 3,
+        "blockingMs": 238,
+        "longestFrameMs": 203
+      },
+      {
+        "wallMs": 1675,
+        "longFrames": 2,
+        "blockingMs": 130,
+        "longestFrameMs": 135
+      },
+      {
+        "wallMs": 1953,
+        "longFrames": 2,
+        "blockingMs": 154,
+        "longestFrameMs": 160
+      }
+    ],
+    "medianWallMs": 1953,
+    "medianLongFrames": 2,
+    "medianBlockingMs": 154
   }
 }

@@ -8,6 +8,8 @@
  * 2. Typing latency on the 210-block stress page, from the Event Timing API
  *    (the same data INP is built from): every keydown/keyup/input event's
  *    duration while typing 40 characters into a text field.
+ * 3. Main-thread blocking while dragging a palette block across that page
+ *    (Long Animation Frames API).
  * Writes perf/results/browser-<label>.json.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -80,9 +82,53 @@ async function measureTyping() {
   return { wallMs, slowEvents: durations.length, durations };
 }
 
+/**
+ * Drag a palette block down across the stress page in 60 pointer steps and sum
+ * the blocking time of long animation frames (LoAF API, frames > 50 ms count
+ * their excess over 50 ms, like TBT).
+ */
+async function measureDrag() {
+  const context = await browser.newContext({ viewport: { width: 1440, height: 900 } });
+  const page = await context.newPage();
+  await page.goto(`${BASE}/editor?template=stress`);
+  await page.waitForURL(/id=/);
+  const canvas = page.getByRole("tree", { name: "Page canvas" });
+  await canvas.getByRole("treeitem").first().waitFor();
+  await page.waitForTimeout(500);
+  await page.evaluate(() => {
+    window.__loaf = [];
+    new PerformanceObserver((list) => {
+      for (const e of list.getEntries()) window.__loaf.push(e.duration);
+    }).observe({ type: "long-animation-frame" });
+  });
+  const source = await page.getByRole("button", { name: "Add Text block" }).boundingBox();
+  const area = await canvas.boundingBox();
+  const start = Date.now();
+  await page.mouse.move(source.x + 20, source.y + 20);
+  await page.mouse.down();
+  await page.mouse.move(source.x + 40, source.y + 40, { steps: 2 });
+  const x = area.x + area.width / 2;
+  for (let i = 0; i <= 60; i++) {
+    await page.mouse.move(x, 80 + (i / 60) * 780);
+  }
+  await page.mouse.up();
+  const wallMs = Date.now() - start;
+  await page.waitForTimeout(500);
+  const frames = await page.evaluate(() => window.__loaf);
+  await context.close();
+  return {
+    wallMs,
+    longFrames: frames.length,
+    blockingMs: Math.round(frames.reduce((t, d) => t + Math.max(0, d - 50), 0)),
+    longestFrameMs: Math.round(Math.max(0, ...frames)),
+  };
+}
+
 const js = await measureJs();
 const typingRuns = [];
 for (let r = 0; r < RUNS; r++) typingRuns.push(await measureTyping());
+const dragRuns = [];
+for (let r = 0; r < RUNS; r++) dragRuns.push(await measureDrag());
 await browser.close();
 
 const all = typingRuns.flatMap((r) => r.durations);
@@ -100,6 +146,13 @@ const report = {
     medianSlowEventMs: all.length ? median(all) : 0,
     p95SlowEventMs: all.length ? pct(all, 0.95) : 0,
     maxEventMs: all.length ? Math.max(...all) : 0,
+  },
+  drag: {
+    pointerSteps: 60,
+    runs: dragRuns,
+    medianWallMs: median(dragRuns.map((r) => r.wallMs)),
+    medianLongFrames: median(dragRuns.map((r) => r.longFrames)),
+    medianBlockingMs: median(dragRuns.map((r) => r.blockingMs)),
   },
 };
 
