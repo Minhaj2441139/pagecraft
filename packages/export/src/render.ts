@@ -1,6 +1,5 @@
-import { BASE_CSS, blockClassName, blockStyleToCss, blockWrapperTag } from "./css";
 import { escapeHtml, safeUrl } from "./escape";
-import type { Block, PageDocument, PageTree } from "./schema";
+import type { Block } from "./schema";
 
 /** Escape text and turn blank-line-separated paragraphs / single newlines into HTML. */
 export function textToHtml(text: string): string {
@@ -117,70 +116,8 @@ export function renderBlockContent(block: Block): string {
   }
 }
 
-function styleAttr(block: Block): string {
-  const css = blockStyleToCss(block.style);
-  return css ? ` style="${escapeHtml(css)}"` : "";
-}
-
 /** Inline style for the grid inside a `columns` block. */
 export function columnsGridStyle(columnCount: number, gap: number): string {
   const safeGap = Number.isFinite(gap) ? Math.max(0, gap) : 24;
   return `grid-template-columns:repeat(${Math.max(1, columnCount)},minmax(0,1fr));gap:${safeGap}px`;
-}
-
-/** Render a block and its descendants. `seen` guards against malformed (cyclic) trees. */
-export function renderBlock(tree: PageTree, id: string, seen: Set<string> = new Set()): string {
-  const block = tree.blocks[id];
-  if (!block || seen.has(id)) return "";
-  seen.add(id);
-  const children = () => block.children.map((childId) => renderBlock(tree, childId, seen)).join("");
-
-  if (block.type === "columns") {
-    return (
-      `<div class="${blockClassName(block)}"${styleAttr(block)}>` +
-      `<div class="pc-columns-grid" style="${columnsGridStyle(block.children.length, block.props.gap)}">` +
-      children() +
-      `</div></div>`
-    );
-  }
-  if (block.type === "column") {
-    return `<div class="${blockClassName(block)}"${styleAttr(block)}>${children()}</div>`;
-  }
-  const tag = blockWrapperTag(block.type);
-  return `<${tag} class="${blockClassName(block)}"${styleAttr(block)}>${renderBlockContent(block)}</${tag}>`;
-}
-
-export function renderPageBody(tree: PageTree): string {
-  const seen = new Set<string>();
-  return tree.rootIds.map((id) => renderBlock(tree, id, seen)).join("\n");
-}
-
-export interface RenderPageOptions {
-  /** Defaults to the document name. */
-  title?: string;
-  lang?: string;
-}
-
-export function renderPageToHtml(doc: PageDocument, options: RenderPageOptions = {}): string {
-  const title = options.title ?? (doc.name || "Untitled page");
-  const lang = options.lang ?? "en";
-  return `<!doctype html>
-<html lang="${escapeHtml(lang)}">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="generator" content="Pagecraft">
-<title>${escapeHtml(title)}</title>
-<style>
-body{margin:0}
-${BASE_CSS}
-</style>
-</head>
-<body>
-<main class="pc-page">
-${renderPageBody(doc)}
-</main>
-</body>
-</html>
-`;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { renderPageToHtml } from "@pagecraft/export";
+import { renderPageToHtml } from "@pagecraft/export/html";
 import { useEffect, useMemo, useRef } from "react";
 
 import { useEditor, useEditorStore } from "@/store/context";

@@ -1,44 +1,44 @@
 {
   "label": "naive",
-  "date": "2026-11-17T19:53:50.005Z",
-  "url": "http://localhost:3123/editor?template=stress",
+  "date": "2026-11-17T20:36:43.222Z",
+  "url": "http://localhost:3124/editor?template=stress",
   "environment": "Lighthouse 12, desktop preset, headless Chrome, local production build",
   "runs": [
     {
-      "score": 83,
-      "fcpMs": 233,
-      "lcpMs": 761,
-      "tbtMs": 373,
+      "score": 72,
+      "fcpMs": 578,
+      "lcpMs": 930,
+      "tbtMs": 691,
       "cls": 0,
-      "speedIndexMs": 852,
+      "speedIndexMs": 1304,
       "totalJsKB": 172.2
     },
     {
-      "score": 75,
-      "fcpMs": 227,
-      "lcpMs": 848,
-      "tbtMs": 613,
+      "score": 77,
+      "fcpMs": 235,
+      "lcpMs": 782,
+      "tbtMs": 539,
       "cls": 0,
-      "speedIndexMs": 868,
+      "speedIndexMs": 921,
       "totalJsKB": 172.2
     },
     {
-      "score": 79,
-      "fcpMs": 234,
-      "lcpMs": 780,
-      "tbtMs": 467,
+      "score": 68,
+      "fcpMs": 275,
+      "lcpMs": 933,
+      "tbtMs": 1033,
       "cls": 0,
-      "speedIndexMs": 848,
+      "speedIndexMs": 1638,
       "totalJsKB": 172.2
     }
   ],
   "median": {
-    "score": 79,
-    "fcpMs": 233,
-    "lcpMs": 780,
-    "tbtMs": 467,
+    "score": 72,
+    "fcpMs": 275,
+    "lcpMs": 930,
+    "tbtMs": 691,
     "cls": 0,
-    "speedIndexMs": 852,
+    "speedIndexMs": 1304,
     "totalJsKB": 172.2
   }
 }

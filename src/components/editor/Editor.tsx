@@ -21,6 +21,9 @@ import { useEditorStore } from "@/store/context";
 
 import Canvas from "./Canvas";
 import { type DragData, draggedType, type DropData, type DropTarget, isDropInsideDragged, resolveDropTarget, toMoveIndex } from "./dnd";
+// Deliberately NOT lazy-loaded: it is visible on first paint, so splitting it
+// deferred nothing and (measured) added a request plus duplicated shared
+// modules under Turbopack. See README → Performance.
 import Palette from "./Palette";
 
 function area(rect: ClientRect | undefined): number {
@@ -134,6 +137,8 @@ export default function Editor({ toolbar, panel }: EditorProps) {
     }),
     [labelFor],
   );
+  // Must be referentially stable: a new object here re-renders every draggable/droppable.
+  const accessibility = useMemo(() => ({ announcements }), [announcements]);
 
   return (
     <DndContext
@@ -143,7 +148,7 @@ export default function Editor({ toolbar, panel }: EditorProps) {
       onDragMove={onDragMove}
       onDragEnd={onDragEnd}
       onDragCancel={finish}
-      accessibility={{ announcements }}
+      accessibility={accessibility}
     >
       <div className="flex h-dvh flex-col bg-slate-50 text-slate-900">
         {toolbar}

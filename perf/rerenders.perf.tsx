@@ -1,6 +1,8 @@
 /**
- * Re-render benchmark: 210-block stress page, full editor (palette, canvas,
- * properties panel) inside a React <Profiler>.
+ * Re-render benchmark: the real /editor route component (toolbar, palette,
+ * canvas, panel, autosave, shortcuts) on the 210-block stress page, inside a
+ * React <Profiler>. Only `next/navigation` is mocked, so the same file runs
+ * unchanged against the naive and the optimized code.
  *
  *   PERF_LABEL=naive npm run perf
  *
@@ -11,15 +13,25 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
-import { act, render } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { Profiler, type ProfilerOnRenderCallback } from "react";
-import { expect, it } from "vitest";
+import { expect, it, vi } from "vitest";
 
 import { buildStressDocument } from "@/blocks/templates";
-import Editor from "@/components/editor/Editor";
-import PropertiesPanel from "@/components/editor/PropertiesPanel";
+import EditorRoute from "@/components/editor/EditorRoute";
+import { savePage } from "@/lib/storage";
 import { EditorStoreProvider } from "@/store/context";
 import { createEditorStore } from "@/store/editor";
+
+const doc = buildStressDocument();
+
+// Stable references, like the real Next.js hooks (EditorRoute's effect depends on them).
+const router = { replace: () => undefined, push: () => undefined };
+const searchParams = new URLSearchParams({ id: doc.id });
+vi.mock("next/navigation", () => ({
+  useRouter: () => router,
+  useSearchParams: () => searchParams,
+}));
 
 const ITERATIONS = 40;
 const LABEL = process.env.PERF_LABEL ?? "current";
@@ -34,8 +46,7 @@ const round = (n: number) => Math.round(n * 100) / 100;
 
 it("measures re-renders on a 210-block page", async () => {
   const store = createEditorStore();
-  const doc = buildStressDocument();
-  store.getState().loadDocument(doc);
+  savePage(doc);
   const blockCount = Object.keys(doc.blocks).length;
 
   let commitDurations: number[] = [];
@@ -47,12 +58,15 @@ it("measures re-renders on a 210-block page", async () => {
   render(
     <Profiler id="editor" onRender={onRender}>
       <EditorStoreProvider store={store}>
-        <Editor panel={<PropertiesPanel />} />
+        <EditorRoute />
       </EditorStoreProvider>
     </Profiler>,
   );
+  await screen.findAllByRole("treeitem", {}, { timeout: 10_000 });
   const mountMs = performance.now() - mountStart;
   const mountProfilerMs = commitDurations.reduce((a, b) => a + b, 0);
+  // Let lazy chunks (palette) settle so they are not counted as per-update work.
+  await screen.findByRole("button", { name: "Add Text block" }, { timeout: 10_000 });
 
   const textIds = Object.values(doc.blocks)
     .filter((b) => b.type === "text")
@@ -61,23 +75,25 @@ it("measures re-renders on a 210-block page", async () => {
   const other = textIds[textIds.length - 1]!;
 
   async function scenario(name: string, step: (i: number) => void) {
-    const renders: Record<string, number[]> = {};
+    const perIteration: Array<Map<string, number>> = [];
     const durations: number[] = [];
     for (let i = 0; i < ITERATIONS; i++) {
-      globalThis.__PC_RENDER_STATS__ = new Map();
+      const stats = new Map<string, number>();
+      globalThis.__PC_RENDER_STATS__ = stats;
       commitDurations = [];
       await act(async () => step(i));
       durations.push(commitDurations.reduce((a, b) => a + b, 0));
-      for (const [component, count] of globalThis.__PC_RENDER_STATS__) {
-        (renders[component] ??= []).push(count);
-      }
+      perIteration.push(stats);
     }
     globalThis.__PC_RENDER_STATS__ = undefined;
+    // Iterations where a component did not render count as 0.
+    const components = [...new Set(perIteration.flatMap((m) => [...m.keys()]))];
     return {
       name,
       medianCommitMs: round(median(durations)),
       p95CommitMs: round([...durations].sort((a, b) => a - b)[Math.floor(durations.length * 0.95)]!),
-      rendersPerUpdate: Object.fromEntries(Object.entries(renders).map(([c, counts]) => [c, median(counts)])),
+      medianRendersPerUpdate: Object.fromEntries(components.map((c) => [c, median(perIteration.map((m) => m.get(c) ?? 0))])),
+      totalRenders: Object.fromEntries(components.map((c) => [c, perIteration.reduce((t, m) => t + (m.get(c) ?? 0), 0)])),
     };
   }
 
