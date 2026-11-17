@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import { blockStyleToCss, blockStyleToObject } from "./css";
 import { safeColor, safeUrl } from "./escape";
-import { renderBlock, renderPageToHtml, textToHtml } from "./render";
+import { renderBlock, renderPageToHtml } from "./html";
+import { textToHtml } from "./render";
 import type { Block, PageDocument } from "./schema";
 
 function block<T extends Block["type"]>(
