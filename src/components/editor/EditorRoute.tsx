@@ -5,16 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 import { getTemplate } from "@/blocks/templates";
-import { ANNOUNCER_ID } from "@/lib/announce";
 import { loadPage, savePage } from "@/lib/storage";
 import { useEditorStore } from "@/store/context";
 
-import Editor from "./Editor";
-import PreviewDialog from "./PreviewDialog";
-import PropertiesPanel from "./PropertiesPanel";
-import Toolbar from "./Toolbar";
-import { useAutosave } from "./useAutosave";
-import { useKeyboardShortcuts } from "./useKeyboardShortcuts";
+import EditorShell from "./EditorShell";
 
 type LoadState = { state: "loading" } | { state: "ready" } | { state: "missing"; id: string };
 
@@ -29,7 +23,6 @@ export default function EditorRoute() {
   const id = params.get("id");
   const templateId = params.get("template");
   const [load, setLoad] = useState<LoadState>({ state: "loading" });
-  const [previewOpen, setPreviewOpen] = useState(false);
 
   // Syncs from localStorage (an external system), which is only readable after mount.
   /* eslint-disable react-hooks/set-state-in-effect */
@@ -54,9 +47,6 @@ export default function EditorRoute() {
   }, [id, templateId, router, store]);
   /* eslint-enable react-hooks/set-state-in-effect */
 
-  const { status, saveNow } = useAutosave(store, load.state === "ready");
-  useKeyboardShortcuts(store, { onSave: saveNow });
-
   if (load.state === "missing") {
     return (
       <main className="grid min-h-dvh place-items-center bg-slate-50 p-6 text-center">
@@ -79,14 +69,5 @@ export default function EditorRoute() {
     );
   }
 
-  return (
-    <>
-      <Editor
-        toolbar={<Toolbar status={status} onSave={saveNow} onPreview={() => setPreviewOpen(true)} />}
-        panel={<PropertiesPanel />}
-      />
-      <PreviewDialog open={previewOpen} onClose={() => setPreviewOpen(false)} />
-      <div id={ANNOUNCER_ID} role="status" aria-live="polite" className="sr-only" />
-    </>
-  );
+  return <EditorShell />;
 }

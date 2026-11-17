@@ -1,14 +1,14 @@
 "use client";
 
-import { renderPageToHtml } from "@pagecraft/export";
 import Link from "next/link";
 
 import { announce } from "@/lib/announce";
 import { downloadFile, slugify } from "@/lib/download";
 import { useEditor, useEditorStore } from "@/store/context";
 
+import type { SaveStatus } from "@/store/editor";
+
 import DeviceToggle from "./DeviceToggle";
-import type { SaveStatus } from "./useAutosave";
 
 const button =
   "rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500 disabled:cursor-not-allowed disabled:opacity-40";
@@ -24,13 +24,23 @@ function statusText(status: SaveStatus): string {
   }
 }
 
-export interface ToolbarProps {
-  status: SaveStatus;
-  onSave: () => void;
-  onPreview: () => void;
+function SaveStatusLabel() {
+  const status = useEditor((s) => s.saveStatus);
+  return (
+    <span role="status" className={`text-xs ${status.state === "error" ? "text-red-600" : "text-slate-500"}`}>
+      {statusText(status)}
+    </span>
+  );
 }
 
-export default function Toolbar({ status, onSave, onPreview }: ToolbarProps) {
+export interface ToolbarProps {
+  onSave: () => void;
+  onPreview: () => void;
+  /** Hover/focus on Preview: start downloading the lazy preview chunk early. */
+  onPreviewIntent?: () => void;
+}
+
+export default function Toolbar({ onSave, onPreview, onPreviewIntent }: ToolbarProps) {
   const store = useEditorStore();
   const name = useEditor((s) => s.meta.name);
   const renamePage = useEditor((s) => s.renamePage);
@@ -39,10 +49,17 @@ export default function Toolbar({ status, onSave, onPreview }: ToolbarProps) {
   const undo = useEditor((s) => s.undo);
   const redo = useEditor((s) => s.redo);
 
-  const exportHtml = () => {
-    const doc = store.getState().toDocument();
-    downloadFile(`${slugify(doc.name)}.html`, renderPageToHtml(doc), "text/html;charset=utf-8");
-    announce("HTML file downloaded");
+  const exportHtml = async () => {
+    try {
+      // Code-split: the document renderer is only downloaded on first export.
+      const { renderPageToHtml } = await import("@pagecraft/export/html");
+      const doc = store.getState().toDocument();
+      downloadFile(`${slugify(doc.name)}.html`, renderPageToHtml(doc), "text/html;charset=utf-8");
+      announce("HTML file downloaded");
+    } catch (error) {
+      console.error("[pagecraft] HTML export failed", error);
+      announce("Export failed. Check your connection and try again.");
+    }
   };
 
   const exportJson = () => {
@@ -72,16 +89,14 @@ export default function Toolbar({ status, onSave, onPreview }: ToolbarProps) {
       </div>
       <DeviceToggle />
       <div className="ml-auto flex items-center gap-2">
-        <span role="status" className={`text-xs ${status.state === "error" ? "text-red-600" : "text-slate-500"}`}>
-          {statusText(status)}
-        </span>
+        <SaveStatusLabel />
         <button type="button" className={button} onClick={onSave} title="Save (Ctrl+S)">
           Save
         </button>
         <button type="button" className={button} onClick={exportJson}>
           JSON
         </button>
-        <button type="button" className={button} onClick={onPreview}>
+        <button type="button" className={button} onClick={onPreview} onPointerEnter={onPreviewIntent} onFocus={onPreviewIntent}>
           Preview
         </button>
         <button

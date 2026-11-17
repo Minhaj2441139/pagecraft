@@ -41,10 +41,17 @@ export interface DropIndicator {
 
 export const ROOT_DROP_ID = "__root__";
 
+export type SaveStatus = { state: "saved" } | { state: "pending" } | { state: "error"; message: string };
+
 export interface EditorState extends PageTree {
   meta: PageMeta;
   selectedId: string | null;
   dropIndicator: DropIndicator | null;
+  /**
+   * Autosave status. Lives in the store (not React state) so only the status
+   * label re-renders when it changes, not the whole editor shell.
+   */
+  saveStatus: SaveStatus;
   past: PageTree[];
   future: PageTree[];
   /** Increments on every document change; drives autosave. */
@@ -75,6 +82,7 @@ export interface EditorState extends PageTree {
 
   setDevice: (device: Device) => void;
   setDropIndicator: (indicator: DropIndicator | null) => void;
+  setSaveStatus: (status: SaveStatus) => void;
 }
 
 export type EditorStore = StoreApi<EditorState>;
@@ -165,6 +173,7 @@ export function createEditorStore(options: CreateEditorStoreOptions = {}): Edito
       meta: { id: initial.id, name: initial.name, createdAt: initial.createdAt, updatedAt: initial.updatedAt },
       selectedId: null,
       dropIndicator: null,
+      saveStatus: { state: "saved" },
       past: [],
       future: [],
       revision: 0,
@@ -269,6 +278,13 @@ export function createEditorStore(options: CreateEditorStoreOptions = {}): Edito
         const current = get().dropIndicator;
         if (current?.overId === indicator?.overId && current?.position === indicator?.position) return;
         set({ dropIndicator: indicator });
+      },
+
+      setSaveStatus: (status) => {
+        const current = get().saveStatus;
+        const same =
+          current.state === status.state && (status.state !== "error" || (current.state === "error" && current.message === status.message));
+        if (!same) set({ saveStatus: status });
       },
     };
   });
