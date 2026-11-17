@@ -32,9 +32,19 @@ export interface EditOptions {
   coalesceKey?: string;
 }
 
+/** Where a drag would land; UI-only, never recorded in history. */
+export interface DropIndicator {
+  /** Block id, or ROOT_DROP_ID for the page itself. */
+  overId: string;
+  position: "before" | "after" | "inside";
+}
+
+export const ROOT_DROP_ID = "__root__";
+
 export interface EditorState extends PageTree {
   meta: PageMeta;
   selectedId: string | null;
+  dropIndicator: DropIndicator | null;
   past: PageTree[];
   future: PageTree[];
   /** Increments on every document change; drives autosave. */
@@ -64,6 +74,7 @@ export interface EditorState extends PageTree {
   canRedo: () => boolean;
 
   setDevice: (device: Device) => void;
+  setDropIndicator: (indicator: DropIndicator | null) => void;
 }
 
 export type EditorStore = StoreApi<EditorState>;
@@ -153,6 +164,7 @@ export function createEditorStore(options: CreateEditorStoreOptions = {}): Edito
       blocks: initial.blocks,
       meta: { id: initial.id, name: initial.name, createdAt: initial.createdAt, updatedAt: initial.updatedAt },
       selectedId: null,
+      dropIndicator: null,
       past: [],
       future: [],
       revision: 0,
@@ -252,6 +264,12 @@ export function createEditorStore(options: CreateEditorStoreOptions = {}): Edito
       canRedo: () => get().future.length > 0,
 
       setDevice: (device) => set({ device }),
+
+      setDropIndicator: (indicator) => {
+        const current = get().dropIndicator;
+        if (current?.overId === indicator?.overId && current?.position === indicator?.position) return;
+        set({ dropIndicator: indicator });
+      },
     };
   });
 }

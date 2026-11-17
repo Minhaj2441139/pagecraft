@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* ---------------------------------------------------------- editor canvas */
+
+.pc-canvas-scroll {
+  flex: 1;
+  overflow: auto;
+  background: #e2e8f0;
+  padding: 24px;
+}
+
+.pc-device-frame {
+  margin: 0 auto;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.1), 0 8px 24px rgb(15 23 42 / 0.08);
+  border-radius: 6px;
+  transition: width 200ms ease;
+  max-width: 100%;
+}
+
+.pc-canvas {
+  min-height: calc(100dvh - 160px);
+  border-radius: 6px;
+  padding-bottom: 8px;
+}
+
+.pc-node {
+  position: relative;
+  outline: none;
+  cursor: grab;
+}
+
+.pc-node::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 2px;
+}
+
+.pc-node:hover:not(:has(.pc-node:hover))::after {
+  border-color: rgb(99 102 241 / 0.45);
+}
+
+.pc-node.is-selected::after {
+  border-color: #6366f1;
+}
+
+.pc-node:focus-visible::after {
+  border-color: #4338ca;
+  box-shadow: 0 0 0 3px rgb(99 102 241 / 0.35);
+}
+
+.pc-node.is-dragging {
+  opacity: 0.4;
+}
+
+.pc-node.drop-before::before,
+.pc-node.drop-after::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #6366f1;
+  border-radius: 2px;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.pc-node.drop-before::before {
+  top: -2px;
+}
+
+.pc-node.drop-after::before {
+  bottom: -2px;
+}
+
+.pc-node.drop-inside::after {
+  border: 2px dashed #6366f1;
+  background: rgb(99 102 241 / 0.06);
+}
+
+.pc-node-label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  display: none;
+  padding: 3px 6px;
+  border-radius: 0 0 4px 0;
+  background: #6366f1;
+  color: #fff;
+  font: 600 11px/1.2 ui-sans-serif, system-ui, sans-serif;
+  pointer-events: none;
+}
+
+.pc-node.is-selected > .pc-node-label {
+  display: block;
+}
+
+/* Leaf content is presentational in the editor: links and <details> must not react. */
+.pc-leaf {
+  pointer-events: none;
+}
+
+.pc-canvas .pc-column {
+  min-height: 80px;
+  height: 100%;
+}
+
+.pc-node-column {
+  cursor: default;
+}
+
+.pc-empty-column {
+  display: grid;
+  place-items: center;
+  min-height: 80px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+.pc-empty-page {
+  display: grid;
+  place-items: center;
+  gap: 4px;
+  align-content: center;
+  min-height: 320px;
+  margin: 24px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.pc-root-drop {
+  height: 48px;
+  margin: 8px;
+  border: 2px dashed transparent;
+  border-radius: 8px;
+}
+
+.pc-root-drop.is-active {
+  border-color: #6366f1;
+  background: rgb(99 102 241 / 0.06);
+}
