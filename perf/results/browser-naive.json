@@ -1,7 +1,7 @@
 {
   "label": "naive",
-  "date": "2026-11-17T19:58:02.511Z",
-  "environment": "Chrome (playwright-core), production build at http://localhost:3123",
+  "date": "2026-11-17T20:33:01.657Z",
+  "environment": "Chrome (playwright-core), production build at http://localhost:3124",
   "editorJs": {
     "files": 8,
     "transferKB": 171.3,
@@ -9,41 +9,55 @@
   },
   "typing": {
     "chars": 40,
-    "runs": 3,
-    "medianWallMsFor40Chars": 776,
+    "runs": 5,
+    "medianWallMsFor40Chars": 1198,
     "eventsOver16msPerRun": [
       160,
       160,
+      161,
+      160,
       160
     ],
-    "medianSlowEventMs": 24,
-    "p95SlowEventMs": 32,
-    "maxEventMs": 48
+    "medianSlowEventMs": 32,
+    "p95SlowEventMs": 56,
+    "maxEventMs": 160
   },
   "drag": {
     "pointerSteps": 60,
     "runs": [
       {
-        "wallMs": 2561,
-        "longFrames": 3,
-        "blockingMs": 238,
-        "longestFrameMs": 203
+        "wallMs": 1826,
+        "longFrames": 4,
+        "blockingMs": 140,
+        "longestFrameMs": 128
       },
       {
-        "wallMs": 1675,
+        "wallMs": 1664,
         "longFrames": 2,
-        "blockingMs": 130,
-        "longestFrameMs": 135
+        "blockingMs": 121,
+        "longestFrameMs": 121
       },
       {
-        "wallMs": 1953,
+        "wallMs": 1830,
         "longFrames": 2,
-        "blockingMs": 154,
-        "longestFrameMs": 160
+        "blockingMs": 131,
+        "longestFrameMs": 127
+      },
+      {
+        "wallMs": 1696,
+        "longFrames": 2,
+        "blockingMs": 152,
+        "longestFrameMs": 174
+      },
+      {
+        "wallMs": 1560,
+        "longFrames": 2,
+        "blockingMs": 82,
+        "longestFrameMs": 109
       }
     ],
-    "medianWallMs": 1953,
+    "medianWallMs": 1696,
     "medianLongFrames": 2,
-    "medianBlockingMs": 154
+    "medianBlockingMs": 131
   }
 }

@@ -15,7 +15,8 @@ describe("Canvas", () => {
     renderEditor();
     expect(within(canvas()).getByText("Your page is empty")).toBeInTheDocument();
 
-    await user.click(screen.getByRole("button", { name: "Add Hero block" }));
+    // The palette is lazy-loaded.
+    await user.click(await screen.findByRole("button", { name: "Add Hero block" }));
     await user.click(screen.getByRole("button", { name: "Add Heading block" }));
 
     expect(items().map((el) => el.getAttribute("aria-label"))).toEqual([
@@ -29,7 +30,7 @@ describe("Canvas", () => {
   it("supports keyboard-only adding via the palette (Enter)", async () => {
     const user = userEvent.setup();
     const { store } = renderEditor();
-    screen.getByRole("button", { name: "Add Text block" }).focus();
+    (await screen.findByRole("button", { name: "Add Text block" })).focus();
     await user.keyboard("{Enter}");
     expect(store.getState().rootIds).toHaveLength(1);
   });
