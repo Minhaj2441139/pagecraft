@@ -1,0 +1,23 @@
+{
+  "label": "naive",
+  "date": "2026-11-17T19:49:57.634Z",
+  "environment": "Chrome (playwright-core), production build at http://localhost:3123",
+  "editorJs": {
+    "files": 8,
+    "transferKB": 171.3,
+    "decodedKB": 557
+  },
+  "typing": {
+    "chars": 40,
+    "runs": 3,
+    "medianWallMsFor40Chars": 882,
+    "eventsOver16msPerRun": [
+      160,
+      160,
+      160
+    ],
+    "medianSlowEventMs": 32,
+    "p95SlowEventMs": 40,
+    "maxEventMs": 48
+  }
+}

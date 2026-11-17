@@ -1,0 +1,52 @@
+{
+  "label": "naive",
+  "date": "2026-11-17T19:48:58.805Z",
+  "environment": "vitest + jsdom, React development build",
+  "blockCount": 210,
+  "iterations": 40,
+  "mount": {
+    "wallMs": 566.01,
+    "profilerMs": 460.42
+  },
+  "scenarios": [
+    {
+      "name": "type one character into a text block",
+      "medianCommitMs": 92.35,
+      "p95CommitMs": 193.64,
+      "rendersPerUpdate": {
+        "Canvas": 1,
+        "BlockNode": 210,
+        "PropertiesPanel": 1
+      }
+    },
+    {
+      "name": "change selection",
+      "medianCommitMs": 90.82,
+      "p95CommitMs": 165.3,
+      "rendersPerUpdate": {
+        "Canvas": 1,
+        "BlockNode": 210,
+        "PropertiesPanel": 1
+      }
+    },
+    {
+      "name": "drag-over indicator moves to another block",
+      "medianCommitMs": 99.19,
+      "p95CommitMs": 175.99,
+      "rendersPerUpdate": {
+        "Canvas": 1,
+        "BlockNode": 210
+      }
+    },
+    {
+      "name": "change a style value",
+      "medianCommitMs": 86.47,
+      "p95CommitMs": 115.37,
+      "rendersPerUpdate": {
+        "Canvas": 1,
+        "BlockNode": 210,
+        "PropertiesPanel": 1
+      }
+    }
+  ]
+}
