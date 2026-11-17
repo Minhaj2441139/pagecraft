@@ -80,7 +80,10 @@ export function renderBlockContent(block: Block): string {
               `<p class="pc-price">${escapeHtml(plan.price)}` +
               (plan.period ? `<span class="pc-period">${escapeHtml(plan.period)}</span>` : "") +
               `</p>` +
-              `<ul>${plan.features.map((f) => `<li>${escapeHtml(f)}</li>`).join("")}</ul>` +
+              `<ul>${plan.features
+                .filter((f) => f.trim())
+                .map((f) => `<li>${escapeHtml(f)}</li>`)
+                .join("")}</ul>` +
               (plan.ctaLabel
                 ? link(plan.ctaLabel, plan.ctaHref, `pc-btn pc-btn-${plan.highlighted ? "solid" : "outline"}`)
                 : "") +
