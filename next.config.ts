@@ -1,0 +1,12 @@
+import bundleAnalyzer from "@next/bundle-analyzer";
+import type { NextConfig } from "next";
+
+const withBundleAnalyzer = bundleAnalyzer({ enabled: process.env.ANALYZE === "true" });
+
+const nextConfig: NextConfig = {
+  reactStrictMode: true,
+  // The export package ships TypeScript source inside the monorepo.
+  transpilePackages: ["@pagecraft/export"],
+};
+
+export default withBundleAnalyzer(nextConfig);
